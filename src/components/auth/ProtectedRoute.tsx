@@ -1,0 +1,1 @@
+// Placeholder for ProtectedRoute component

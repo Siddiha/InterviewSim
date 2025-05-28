@@ -1,0 +1,142 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  interviews Interview[]
+  sessions   InterviewSession[]
+  
+  @@map("users")
+}
+
+model Interview {
+  id          String         @id @default(cuid())
+  title       String
+  description String?
+  type        InterviewType  @default(GENERAL)
+  difficulty  Difficulty     @default(BEGINNER)
+  duration    Int            @default(30) // in minutes
+  isActive    Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  
+  // Relations
+  createdBy   User           @relation(fields: [createdById], references: [id])
+  createdById String
+  questions   Question[]
+  sessions    InterviewSession[]
+  
+  @@map("interviews")
+}
+
+model Question {
+  id         String       @id @default(cuid())
+  text       String
+  type       QuestionType @default(TEXT)
+  category   String       @default("general")
+  difficulty Difficulty   @default(BEGINNER)
+  order      Int          @default(0)
+  timeLimit  Int?         // in seconds
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  
+  // Relations
+  interview   Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  interviewId String
+  responses   Response[]
+  
+  @@map("questions")
+}
+
+model InterviewSession {
+  id          String        @id @default(cuid())
+  status      SessionStatus @default(PENDING)
+  score       Float?
+  feedback    String?
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  // Relations
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  interview   Interview @relation(fields: [interviewId], references: [id])
+  interviewId String
+  responses   Response[]
+  
+  @@map("interview_sessions")
+}
+
+model Response {
+  id         String   @id @default(cuid())
+  answer     String
+  audioUrl   String?
+  videoUrl   String?
+  duration   Int?     // in seconds
+  score      Float?
+  feedback   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  // Relations
+  session    InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId  String
+  question   Question         @relation(fields: [questionId], references: [id])
+  questionId String
+  
+  @@map("responses")
+}
+
+enum Role {
+  USER
+  ADMIN
+  INTERVIEWER
+}
+
+enum InterviewType {
+  TECHNICAL
+  BEHAVIORAL
+  CASE_STUDY
+  GENERAL
+  CODING
+}
+
+enum QuestionType {
+  TEXT
+  MULTIPLE_CHOICE
+  CODING
+  VIDEO
+  AUDIO
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum SessionStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+} 
