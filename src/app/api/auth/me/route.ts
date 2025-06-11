@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    return NextResponse.json({ user });
+    return NextResponse.json({ user: user });
   } catch (error) {
     console.error("Get user error:", error);
     return NextResponse.json(

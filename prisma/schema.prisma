@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Or your preferred database provider (e.g., sqlite, mysql)
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String?
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  interviews Interview[]
+  answers   Answer[]
+  sessions  InterviewSession[]
+}
+
+model Interview {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  title       String
+  description String?
+  type        String // e.g., 'technical', 'behavioral'
+  difficulty  String // e.g., 'easy', 'medium'
+  duration    Int    // in minutes
+  status      String @default("draft") // e.g., 'draft', 'in-progress', 'completed'
+  score       Float? // Overall score
+  feedback    String? // Overall feedback
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  questions   Question[]
+  sessions    InterviewSession[]
+}
+
+model Question {
+  id          String    @id @default(cuid())
+  interviewId String
+  interview   Interview @relation(fields: [interviewId], references: [id])
+  text        String
+  type        String // e.g., 'text', 'multiple-choice', 'coding'
+  order       Int
+  timeLimit   Int? // in seconds
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  answers     Answer[]
+}
+
+model Answer {
+  id          String    @id @default(cuid())
+  questionId  String
+  question    Question  @relation(fields: [questionId], references: [id])
+  interviewId String // Redundant but can be useful for queries
+  interview   Interview @relation(fields: [interviewId], references: [id])
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  text        String? // For text-based answers
+  audioUrl    String? // For audio recordings
+  videoUrl    String? // For video recordings
+  score       Float? // Score for this specific answer
+  feedback    String? // Feedback for this specific answer
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model InterviewSession {
+    id          String    @id @default(cuid())
+    interviewId String
+    interview   Interview @relation(fields: [interviewId], references: [id])
+    userId      String
+    user        User      @relation(fields: [userId], references: [id])
+    startTime   DateTime  @default(now())
+    endTime     DateTime?
+    status      String    @default("in-progress") // e.g., 'in-progress', 'completed', 'abandoned'
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+} 

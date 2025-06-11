@@ -8,10 +8,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { registerSchema, type RegisterInput } from "@/lib/validations";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import ErrorMessage from "@/components/ui/ErrorMessage";
+import { SuccessMessage } from "@/components/ui/ErrorMessage";
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const { register: registerUser } = useAuth();
 
   const {
@@ -25,6 +28,7 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterInput) => {
     setIsLoading(true);
     setError("");
+    setSuccess("");
 
     const result = await registerUser(
       data.name,
@@ -35,6 +39,8 @@ export default function RegisterPage() {
 
     if (!result.success) {
       setError(result.error || "Registration failed");
+    } else {
+      setSuccess("Registration successful! Redirecting to dashboard...");
     }
 
     setIsLoading(false);
@@ -59,11 +65,8 @@ export default function RegisterPage() {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
+          {error && <ErrorMessage message={error} />}
+          {success && <SuccessMessage message={success} />}
 
           <div className="space-y-4">
             <Input

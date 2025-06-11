@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { loginSchema, type LoginInput } from "@/lib/validations";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import ErrorMessage from "@/components/ui/ErrorMessage";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -54,11 +55,7 @@ export default function LoginPage() {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
+          {error && <ErrorMessage message={error} />}
 
           <div className="space-y-4">
             <Input

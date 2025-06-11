@@ -4,28 +4,22 @@ import { z } from "zod";
 // Auth schemas
 export const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(1, "Password is required"),
 });
 
-export const registerSchema = z
-  .object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
+export const registerSchema = z.object({
+  name: z.string().min(2, "Name is required and must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters long"),
+});
 
 // Interview schemas
 export const createInterviewSchema = z.object({
-  title: z.string().min(1, "Title is required"),
+  type: z.string().min(1, "Interview type is required"),
+  difficulty: z.string().min(1, "Difficulty is required"),
+  duration: z.number().min(1, "Duration must be at least 1 minute"),
+  title: z.string().optional(),
   description: z.string().optional(),
-  type: z.enum(["TECHNICAL", "BEHAVIORAL", "CASE_STUDY", "GENERAL", "CODING"]),
-  difficulty: z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED", "EXPERT"]),
-  duration: z.number().min(5).max(180), // 5 minutes to 3 hours
 });
 
 export const createQuestionSchema = z.object({
