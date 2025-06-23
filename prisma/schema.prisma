@@ -38,6 +38,7 @@ model Interview {
   updatedAt   DateTime  @updatedAt
   questions   Question[]
   sessions    InterviewSession[]
+  answers     Answer[]
 }
 
 model Question {
@@ -57,7 +58,7 @@ model Answer {
   id          String    @id @default(cuid())
   questionId  String
   question    Question  @relation(fields: [questionId], references: [id])
-  interviewId String // Redundant but can be useful for queries
+  interviewId String
   interview   Interview @relation(fields: [interviewId], references: [id])
   userId      String
   user        User      @relation(fields: [userId], references: [id])
