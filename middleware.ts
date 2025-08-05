@@ -38,3 +38,12 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)?"],
 };
+
+
+let name: string = "Alice";
+let age: number = 25;
+let isStudent: boolean = true;
+
+// Arrays
+let numbers: number[] = [1, 2, 3];
+let mixed: (string | number)[] = ["hello", 42]; 
